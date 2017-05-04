@@ -8,15 +8,22 @@ package gui;
 import java.awt.Color;
 import javax.swing.*;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.event.ActionListener;
-
 
 /**
  *
  * @author Estudiante
  */
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class GUI extends JFrame {
 
     public GUI() {
@@ -26,7 +33,7 @@ public class GUI extends JFrame {
     public static void main(String[] args) {
         GUI frame = new GUI();
         frame.setTitle("HolaMundo");
-        frame.setSize(1000, 1500);
+        frame.setSize(1000, 550);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -34,76 +41,109 @@ public class GUI extends JFrame {
 
 }
 
-class NewPanel extends JPanel implements ActionListener{
-private Timer timer;
-private int x;
+class NewPanel extends JPanel implements ActionListener, MouseListener {
+
+    private Timer timer;
+    private int x;
+    private int y;
+    private int secuencia;
 
     public NewPanel() {
-          timer = new Timer(25, this);
-            timer.start();
-            this.x=20;
+        this.addMouseListener(this);
+        timer = new Timer(25, this);
+        timer.start();
+        this.x = 20;
     }
 
+    public Rectangle ObtenerPunto() {
+        return new Rectangle(x + 150, 350, 350, 210);
+    }
+
+    public void CheckCollisions() {
+        Rectangle Carro = this.ObtenerPunto();
+        Rectangle muro = new Rectangle(720, 420, 150, 110);
+        if (Carro.intersects(muro)) {
+            System.out.println("colision");
+           timer.stop();
+
+        }
+    }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        System.out.println("Click");
-        
-        //rectangulo
+        Image fondo = cargarimagen("fondo.png");
+       Image fondo1 = cargarimagen("cats.gif");
+        g.drawImage(fondo, 0, 0, null);
+      //  g.drawImage(fondo1, 0, 0, null);
+        g.drawImage(fondo1, x, y,x + 132,y+80,(this.secuencia*132),+0,(this.secuencia*132)+132,80,this);
 
-       
+        //rectangulo
         Polygon polygon = new Polygon();
-        g.fillOval(x+600, 700, 60, 60);
-        g.fillOval(x+800, 700, 60, 60);
+        g.fillOval(x + 200, 500, 60, 60);
+        g.fillOval(x + 400, 500, 60, 60);
         g.setColor(Color.red);
-        g.fillRect(x+550, 620, 350, 80);
+        g.fillRect(x + 150, 420, 350, 80);
 
-        polygon.addPoint(x+570, 620);
-        polygon.addPoint(x+600, 550);
-        polygon.addPoint(x+850, 550);
-        polygon.addPoint(x+870, 620);
+        polygon.addPoint(x + 170, 420);
+        polygon.addPoint(x + 200, 350);
+        polygon.addPoint(x + 450, 350);
+        polygon.addPoint(x + 470, 420);
+
         //rectangulo
-        g.drawRect(x+550, 550, 350, 210);
-          g.setColor(Color.red);
+        g.setColor(Color.red);
         g.fillPolygon(polygon);
-        /*
-        g.setColor(Color.blue);
-        g.drawRect(570, 550, 350, 210);
-        Polygon polygon1 = new Polygon();
-        g.drawOval(620, 700, 60, 60);
-        g.drawOval(820, 700, 60, 60);
-        //rectangulo
-        g.drawRect(570, 620, 350, 80);
+        g.drawRect(x + 150, 350, 350, 210);
+        g.fillRect(720, 420, 150, 110);
+    }
 
-        polygon1.addPoint(590, 620);
-        polygon1.addPoint(620, 550);
-        polygon1.addPoint(870, 550);
-        polygon1.addPoint(890, 620);
+        
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        x += 100; 
+        if (this.secuencia==5) {
+            this.secuencia =0;
+        }else
+            this.secuencia++;
+        
+        //CheckCollisions();
+        repaint();
+       
+    }
 
-        g.drawPolygon(polygon1);
-*/
-       /* g.setColor(Color.MAGENTA);
-        Polygon polygon2 = new Polygon();
-        g.drawOval(640, 700, 60, 60);
-        g.drawOval(840, 700, 60, 60);
-        g.drawRect(590, 620, 350, 80);
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        Point mp = e.getPoint();
+        if (ObtenerPunto().contains(mp)) {
 
-        polygon2.addPoint(610, 620);
-        polygon2.addPoint(640, 550);
-        polygon2.addPoint(890, 550);
-        polygon2.addPoint(910, 620);
+            timer.stop();
 
-        g.drawPolygon(polygon2);
-        g.drawRect(590, 550, 350, 210);
-       */
+        }
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
 
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        x+=1;
-       repaint();
+    public void mouseReleased(MouseEvent e) {
+
     }
-    
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    public Image cargarimagen(String imagen) {
+        ImageIcon aaaaa = new ImageIcon(imagen);
+        Image image = aaaaa.getImage();
+        return image;
+    }
 }
